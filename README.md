@@ -51,6 +51,7 @@ uv run --locked python -m app.agent \
 - `app/main.py`、`web/` 和 `app/runtime/store.py` 提供本地网页、HTTP 接口及任务与版本存储。
 - `contracts/`、`prompts/` 和 `skills/` 定义结构化交换、文种规则及核稿要求。背景设计见[开工规格](docs/开工规格.md)。
 - `deploy/openagent/20261112/overlay/` 保留 OpenAgent 的源码适配层，包括调用入口、托管模型适配和 OpenClaw 工具。宿主部署需要自己的环境配置和授权。默认本地启动使用根目录版本。固定公开样本的日期改稿试跑另需原始材料及本地校验清单 `data/s0-s1/nanyang-2024-24/SHA256SUMS`，常规起草与 Word 原生审阅可独立使用。
+- `tests/` 中的本地回归测试覆盖 Word 批注与接受修订、材料读取、通知日期留空、审阅绑定和交付结构。公开测试使用可随仓运行的示例或临时生成的输入。
 
 ```bash
 uv run --locked python -m unittest discover -s tests

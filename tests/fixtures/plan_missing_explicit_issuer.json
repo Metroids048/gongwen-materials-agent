@@ -1,0 +1,99 @@
+{
+  "original_request": "帮我写个社区消防排查安排，周五下午开始，居委会牵头，物业检查楼道，志愿者负责宣传。后面放张分工表，联系人和电话先空着，落款写幸福社区，日期先不写。",
+  "candidate": {
+    "profile": "plan-draft",
+    "material_uses": [
+      {
+        "source_id": "U",
+        "role": "mixed",
+        "usable_anchors": [
+          "U.1"
+        ]
+      }
+    ],
+    "questions": [],
+    "title": "社区消防排查安排",
+    "sections": [
+      {
+        "title": "安排说明",
+        "paragraphs": [
+          {
+            "text": "为做好社区消防安全排查工作，安排于周五下午开始开展排查。居委会牵头组织，物业负责检查楼道，志愿者负责宣传。",
+            "kind": "fact",
+            "anchors": [
+              "U.1"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "任务分工",
+        "paragraphs": [
+          {
+            "text": "居委会负责牵头组织社区消防排查，统筹相关工作安排。",
+            "kind": "fact",
+            "anchors": [
+              "U.1"
+            ]
+          },
+          {
+            "text": "物业负责开展楼道检查，志愿者负责做好消防排查宣传工作。",
+            "kind": "fact",
+            "anchors": [
+              "U.1"
+            ]
+          }
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "action": "组织开展社区消防排查",
+        "lead": "牵头：居委会",
+        "support": "",
+        "timing": "周五下午开始",
+        "deliverable": "",
+        "acceptance": "",
+        "contact": "",
+        "phone": "",
+        "status": "confirmed",
+        "anchors": [
+          "U.1"
+        ]
+      },
+      {
+        "action": "检查楼道",
+        "lead": "物业",
+        "support": "",
+        "timing": "周五下午开始",
+        "deliverable": "",
+        "acceptance": "",
+        "contact": "",
+        "phone": "",
+        "status": "confirmed",
+        "anchors": [
+          "U.1"
+        ]
+      },
+      {
+        "action": "开展消防排查宣传",
+        "lead": "志愿者",
+        "support": "",
+        "timing": "周五下午开始",
+        "deliverable": "",
+        "acceptance": "",
+        "contact": "",
+        "phone": "",
+        "status": "confirmed",
+        "anchors": [
+          "U.1"
+        ]
+      }
+    ],
+    "review_notes": [
+      "排查覆盖的具体社区范围、楼栋或楼道对象尚未提供，需补充确认。",
+      "消防排查的具体检查内容、发现问题后的处置要求及反馈方式尚未提供，需补充确认。",
+      "联系人和电话按用户要求留空，落款日期按用户要求留空。"
+    ]
+  }
+}
