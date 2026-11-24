@@ -1,0 +1,23 @@
+[project]
+name = "gongwen-materials"
+version = "0.1.0"
+description = "公文材料 Agent 本地任务登记骨架"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastapi==0.162.0",
+    "openpyxl==3.1.5",
+    "pydantic==2.14.2",
+    "pypdf==6.21.4",
+    "python-docx==1.2.0",
+    "uvicorn==0.54.0",
+]
+
+[dependency-groups]
+dev = ["jsonschema==4.26.0"]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true

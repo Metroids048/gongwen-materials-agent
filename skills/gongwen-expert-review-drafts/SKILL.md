@@ -1,0 +1,19 @@
+---
+name: gongwen-expert-review-drafts
+description: Draft editable Chinese briefs, speeches, requests for approval, minutes, and consultation notices for review.
+---
+# Review Drafts by Document Type
+
+Styles 2, 3, 4, and 6 in the pinned [gongwen-skill 2.15.0](https://pypi.org/project/gongwen-skill/2.15.0/) release inform the format. Use current evidence for people, dates, results, and agendas.
+
+- Brief: state what population and scope the materials cover. Explain the method, what the evidence supports, and what remains uncertain. Distinguish overall coverage, visits, issue logs, and outcomes. Draft when the scope can be stated. Leave missing statistics in review notes. When verification is requested, use `proposal` to describe records, deduplication or calculation, and the output. Do not generalize from another locality.
+- Speech: use natural paragraphs for the known occasion, deployment, and follow-up. Give one action per paragraph and make it easy to read aloud. For distinct inspections, keep each scope and purpose clear and describe the relevant rectification and evidence for reinspection. Omit unsupported names, timing, and figures.
+- Broadcasting operations speeches: for 「基层基础」, include a separate paragraph addressing inspection against the equipment inventory, logging and retesting faults, handover and escalation via the existing mechanism, and hands-on practice in incident reporting and emergency response followed by review. Use existing policies and known practices. Do not invent schedules, rosters, or results.
+- Request for approval: one issue, with the requested approval clearly stated alongside the addressee, grounds and funding where supported, and closing request. Use natural pre-approval wording such as 「拟」 and 「提请」. A public comparable approval can inform figures but does not approve this exercise. Mark a drill prominently in the title. Put missing prerequisites in notes.
+- Minutes: organize by actual meeting and status, one issue per paragraph. Distinguish hearing or deliberation, submission after revisions, a passed vote, and existing issuance arrangements. Keep each chair, count, and item with its source. Leave unknown owners and timing open. Deliberation or a proposal is provisional.
+- Drill debrief speech: trace observed outcomes, subsequent findings, causes to verify, and the next test. State which anomaly each retest addresses and who handles issuance, issue feedback, and technical support based on the materials. Present proposed checks as future work.
+- Emergency broadcasting debrief: verify connectivity against the expected integration list and interface or joint-test receipts, device availability against the expected device inventory and heartbeats or logs over one observation period, and actual broadcasts against dispatch logs plus terminal playback or field listening records for the same task. Specify numerators and scope and retest corrections on the same basis. Leave unspecified thresholds, periods, and official metrics for confirmation.
+- Expense approval: state the proposed purpose, period, and decision sought. Separate cost estimates, procurement results, funding channels, and actual spending. Preserve explicit statements that costs have not occurred. Use recorded risks, with unknown dates left for confirmation. Absence of loss or an assigned duty roster does not establish backup capacity.
+- Consultation: use `opinion-draft` and an empty `tasks`. State the scope, objectives, and support. Avoid invented deadlines or presenting goals as results. Add one section 「逐项反馈表」. Use a paragraph per supported topic, with only 「已有方向｜请反馈的问题」. The host adds an editable response column. Ask questions recipients can answer about their locations, current practices, or service populations.
+
+Return readable Chinese drafts. Keep editorial comments, sources, and unresolved details in the appropriate review notes.

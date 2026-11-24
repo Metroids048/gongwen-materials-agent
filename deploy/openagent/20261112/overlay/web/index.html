@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>公文材料 Agent</title>
+  <link rel="stylesheet" href="static/style.css">
+  <script src="static/main.js?v=20261116-r8" defer></script>
+</head>
+<body>
+  <main>
+    <header class="intro">
+      <p class="eyebrow">办公室与业务科室 · 本地试用</p>
+      <h1>公文材料 Agent</h1>
+      <p>选择材料类型，用自己的话说明需求。登记后可凭任务 ID 在此浏览器重开。</p>
+    </header>
+
+    <div class="workspace">
+      <section class="card" aria-labelledby="register-heading">
+        <h2 id="register-heading">登记新任务</h2>
+        <form id="register">
+          <label for="profile">办理路径</label>
+          <select id="profile" name="profile" required disabled>
+            <option value="">请选择材料类型</option>
+          </select>
+          <label for="request">写作或改稿需求</label>
+          <textarea id="request" name="request" rows="5" required
+            placeholder="例如：把安全排查的截止时间改到 12 月底，第二部分保持不变。"></textarea>
+          <fieldset id="public-inputs" hidden>
+            <legend>南阳公开材料改稿试跑</legend>
+            <p>请上传已校验的三份公开原件。当前支持同步调整一处月底日期，并保护一个明确指定的小节。</p>
+            <label for="body-file">方案正文 TXT</label>
+            <input id="body-file" type="file" accept=".txt">
+            <label for="table-file">附件 1 任务分工表 Word</label>
+            <input id="table-file" type="file" accept=".docx">
+            <label for="reference-file">附件 2 项目清单 Word</label>
+            <input id="reference-file" type="file" accept=".docx">
+            <label class="consent"><input id="public-consent" type="checkbox">
+              修改意见只涉及公开试跑，允许由本机 Codex 处理。</label>
+          </fieldset>
+          <button id="submit" type="submit" disabled>登记任务</button>
+        </form>
+      </section>
+
+      <div class="side">
+        <section class="card" id="draft-intake" hidden>
+          <h2>用自己的话起草</h2>
+          <form id="draft-form">
+            <label for="draft-request">想写什么，准备拿去做什么</label>
+            <textarea id="draft-request" rows="5" maxlength="4000" required></textarea>
+            <label for="draft-file">公开材料附件（可选，TXT）</label>
+            <input id="draft-file" type="file" accept=".txt,text/plain">
+            <label for="draft-mode">起草方式</label>
+            <select id="draft-mode">
+              <option value="single">公文专家 · 独立起草</option>
+              <option value="team">公文专家团 · 工作方案与会商稿，含独立核稿</option>
+            </select>
+            <label class="consent"><input id="draft-consent" type="checkbox" required>
+              <span>材料公开，允许由本机 Codex 处理。</span></label>
+            <button id="draft-submit" type="submit">生成起草稿</button>
+          </form>
+        </section>
+        <section class="card" id="opinion-intake" hidden>
+          <h2>Word 改稿与逐条核稿</h2>
+          <form id="opinion-form">
+            <label for="opinion-mode">意见来自哪里</label>
+            <select id="opinion-mode">
+              <option value="native">Word 内的批注或修订</option>
+              <option value="external">另附意见及答复表</option>
+            </select>
+            <label for="opinion-request">本轮怎么改，哪些内容锁定</label>
+            <textarea id="opinion-request" rows="4" maxlength="4000" required
+              placeholder="在这份手改稿上按会签答复改，序言和责任单位锁定。"></textarea>
+            <label id="opinion-file-label" for="opinion-files">一份带原生审阅标记的 Word</label>
+            <input id="opinion-files" type="file" accept=".docx,.txt,.md,.csv" multiple required>
+            <label for="opinion-template">空白意见汇总表（可选，辽宁六列 DOCX）</label>
+            <input id="opinion-template" type="file" accept=".docx">
+            <label class="consent"><input id="opinion-consent" type="checkbox" required>
+              <span id="opinion-consent-label">材料公开或已获授权，可在本机处理。</span></label>
+            <button id="opinion-submit" type="submit">生成核稿单</button>
+          </form>
+        </section>
+        <section class="card" id="formal-intake" hidden>
+          <h2>通知红头正文套版</h2>
+          <p>当前支持紫阳县政府办公开的《政府办(图三)》通知样张。请上传由原 .doc 转存的兼容 DOCX，并填写已经核定的内容。</p>
+          <form id="formal-form">
+            <label for="formal-template">单位通知样张（DOCX）</label>
+            <input id="formal-template" type="file" accept=".docx" required>
+            <label for="formal-title">通知标题</label>
+            <input id="formal-title" maxlength="120" required>
+            <label for="formal-number">发文字号</label>
+            <input id="formal-number" maxlength="40" placeholder="紫政办发〔2020〕78号" required>
+            <label for="formal-addressee">主送机关（含末尾全角冒号）</label>
+            <input id="formal-addressee" maxlength="300" required>
+            <label for="formal-body">已核定正文（每段一行）</label>
+            <textarea id="formal-body" rows="8" maxlength="24000" required></textarea>
+            <label for="formal-attachments">附件名称（每项一行，编号自动添加）</label>
+            <textarea id="formal-attachments" rows="3" maxlength="2000"></textarea>
+            <label for="formal-issuer">发文机关署名</label>
+            <input id="formal-issuer" maxlength="80" required>
+            <label for="formal-date">成文日期</label>
+            <input id="formal-date" maxlength="30" placeholder="2020年8月29日" required>
+            <label class="consent"><input id="formal-consent" type="checkbox" required>
+              <span>模板及材料公开或已获授权，可在本机处理。</span></label>
+            <button id="formal-submit" type="submit">生成套版前后 Word</button>
+          </form>
+        </section>
+        <section class="card" aria-labelledby="lookup-heading">
+          <h2 id="lookup-heading">重开已有任务</h2>
+          <form id="lookup">
+            <label for="task-id">任务 ID</label>
+            <input id="task-id" name="task-id" required autocomplete="off" spellcheck="false">
+            <button type="submit" class="secondary">重开任务</button>
+          </form>
+        </section>
+        <aside aria-label="当前可用能力">
+          <strong>当前可用</strong>
+          <p id="capability-note">文本任务登记与重开。正在读取公开试跑能力。</p>
+        </aside>
+      </div>
+    </div>
+
+    <p id="message" role="status"></p>
+    <section class="card result" id="result" aria-labelledby="result-heading" hidden>
+      <h2 id="result-heading">任务记录</h2>
+      <p class="badge" id="task-state"></p>
+      <dl>
+        <dt>任务 ID</dt><dd><code id="saved-id"></code></dd>
+        <dt>办理路径</dt><dd id="saved-profile"></dd>
+        <dt>原始需求</dt><dd id="saved-request"></dd>
+      </dl>
+      <section id="draft-result" hidden>
+        <h3>起草交件</h3>
+        <p id="draft-state"></p>
+        <ul id="draft-downloads"></ul>
+      </section>
+      <section id="opinion-result" hidden>
+        <h3>逐条核稿交件</h3>
+        <p id="opinion-state"></p>
+        <ul id="opinion-downloads"></ul>
+      </section>
+      <section id="formal-result" hidden>
+        <h3>通知红头正文交件</h3>
+        <p id="formal-state"></p>
+        <ul id="formal-downloads"></ul>
+      </section>
+      <section id="revision" aria-labelledby="revision-heading" hidden>
+        <h3 id="revision-heading">工作方案改稿</h3>
+        <p>原件已保存</p>
+        <ul id="saved-sources"></ul>
+        <p>当前版 <code id="current-revision"></code></p>
+        <p id="revision-error"></p>
+        <button id="generate" type="button" hidden>生成改稿候选</button>
+        <details id="manual-editor" hidden>
+          <summary>手改当前稿</summary>
+          <p>可改普通正文。锁定小节、标题和与任务表联动的日期段可在预览中查看。</p>
+          <form id="manual-form">
+            <label for="manual-paragraph">选择可编辑段落</label>
+            <select id="manual-paragraph" required></select>
+            <label for="manual-text">段落正文</label>
+            <textarea id="manual-text" rows="5" maxlength="4000" required></textarea>
+            <button id="save-edit" type="submit">保存手改</button>
+            <p id="manual-message" role="status"></p>
+          </form>
+        </details>
+        <div id="current-preview" hidden>
+          <details id="current-word-preview">
+            <summary>查看网页当前稿</summary>
+            <div id="current-body"></div>
+            <div class="table-scroll" id="current-table">
+              <table>
+                <caption>当前稿 · 任务分工表相关行</caption>
+                <thead><tr id="current-table-head"></tr></thead>
+                <tbody><tr id="current-table-row"></tr></tbody>
+              </table>
+            </div>
+          </details>
+          <details id="current-lock">
+            <summary>查看当前稿锁定段落</summary>
+            <div id="current-locked-text"></div>
+          </details>
+          <details id="manual-changes" hidden>
+            <summary>查看本次手改对照</summary>
+            <div id="manual-change-list"></div>
+          </details>
+        </div>
+        <div class="downloads" id="downloads" hidden>
+          <a id="download-word">下载当前版 Word</a>
+          <a id="download-reference">下载附件 2 原件</a>
+          <p id="export-receipt">Word 按当前稿版本下载。</p>
+        </div>
+        <div id="candidate" hidden>
+          <p><strong id="candidate-label"></strong> <code id="candidate-id"></code></p>
+          <p>父版 <code id="parent-id"></code></p>
+          <p id="candidate-conflict" role="status" hidden>当前稿已有新版本，此候选已过期。</p>
+          <p id="date-basis"></p>
+          <details id="changes">
+            <summary>查看变化对照</summary>
+            <div id="change-list"></div>
+          </details>
+          <details id="locked">
+            <summary>查看锁定段落</summary>
+            <div id="locked-text"></div>
+          </details>
+          <details id="word-preview">
+            <summary>查看正文与相关任务表行</summary>
+            <div id="body-preview"></div>
+            <div class="table-scroll">
+              <table>
+                <caption>任务分工表相关行</caption>
+                <thead><tr id="table-head"></tr></thead>
+                <tbody><tr id="table-row"></tr></tbody>
+              </table>
+            </div>
+          </details>
+          <button id="commit" type="button" hidden>采用为当前稿</button>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

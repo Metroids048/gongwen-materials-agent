@@ -1,0 +1,140 @@
+{
+  "suite_version": "0.3",
+  "status": "not_run",
+  "description": "设计情境均为合成说明，没有生成结果。四条核心路径后续须绑定真实脱敏输入；缺陷情境用于指导回归，不等于十二个真实留出任务。",
+  "data_plan": {
+    "development_real_tasks": {"experience-draft": 1, "experience-revise": 1, "plan-draft": 1, "plan-revise": 1},
+    "heldout_real_tasks": {"experience-draft": 3, "experience-revise": 3, "plan-draft": 3, "plan-revise": 3},
+    "real_tasks_collected": 0,
+    "required_evidence_per_run": ["original_request", "input_refs_and_hashes", "model_and_tool_versions", "output_revision", "artifacts", "automatic_results", "professional_review", "user_acceptance", "active_user_time", "waiting_time", "external_preparation_time"]
+  },
+  "cases": [
+    {
+      "id": "CORE-01", "profile_id": "experience-draft", "suite": "core_design", "status": "not_run",
+      "prompt": "用这些材料写一份经验交流稿，突出基层减负，2500字左右。今年数据按统计表，去年稿只参考写法，案例别丢。",
+      "fixture_needed": "今年记录、今年统计表、去年认可稿；待绑定真实脱敏资料。",
+      "actions": ["parse_sources", "prepare_basis", "generate_candidate", "review_document", "commit_candidate", "export_revision"],
+      "invariants": ["I01", "I02", "I06", "I08"],
+      "expected_observable": ["主题体现真实做法和案例", "无去年数据误入", "正文可核对出处", "下载 Word 对应当前稿"],
+      "review_layers": ["program", "model", "professional", "user"]
+    },
+    {
+      "id": "CORE-02", "profile_id": "experience-revise", "suite": "core_design", "status": "not_run",
+      "prompt": "这篇太散，突出网格员参与的做法，压到2000字左右，所有数字和两个案例保留，结尾别再喊口号。",
+      "fixture_needed": "待改原稿、保留事实及两例的人工确认；待绑定真实资料。",
+      "actions": ["prepare_basis", "revise_candidate", "review_document", "commit_candidate", "export_revision"],
+      "invariants": ["I01", "I02", "I03", "I05"],
+      "expected_observable": ["重点重排有效", "数字及主体口径时段均保留", "案例核心未删改", "变化对照可用"],
+      "review_layers": ["program", "model", "professional", "user"]
+    },
+    {
+      "id": "CORE-03", "profile_id": "plan-draft", "suite": "core_design", "status": "not_run",
+      "prompt": "按通知做安全排查方案，综合办牵头、各部门配合，排查和复核分阶段，预算还没定，给我正文和分工表。",
+      "fixture_needed": "上级通知、职责和明确任务时间；待绑定真实资料。",
+      "actions": ["prepare_basis", "generate_candidate", "review_document", "commit_candidate", "export_revision"],
+      "invariants": ["I02", "I04", "I06", "I08"],
+      "expected_observable": ["任务有交付物与验收方式", "日期依赖可行", "未定预算未伪装批准", "正文及可编辑 Word 任务表一致"],
+      "review_layers": ["program", "model", "professional", "user"]
+    },
+    {
+      "id": "CORE-04", "profile_id": "plan-revise", "suite": "core_design", "status": "not_run",
+      "prompt": "排查改到12月底完成，宣传培训并到第一阶段，第二部分别动，相关时间和分工表一起改。",
+      "fixture_needed": "现行方案和表格，第二部分无日期冲突的正常输入；待绑定真实资料。",
+      "actions": ["revise_candidate", "review_document", "commit_candidate", "export_revision"],
+      "invariants": ["I02", "I03", "I04", "I06"],
+      "expected_observable": ["意见逐条落实", "锁定部分不变", "正文表格关联节点同步", "父版可恢复"],
+      "review_layers": ["program", "model", "professional", "user"]
+    },
+    {
+      "id": "FAULT-01", "profile_id": "experience-draft", "suite": "failure_design", "status": "not_run",
+      "setup": "今年记录与统计表对同一时段、同一主体给出不同数量，用户未指定权威来源。",
+      "actions": ["prepare_basis", "record_answers"], "invariants": ["I01", "I08"],
+      "expected_observable": ["具体冲突及出处可见", "未擅选较大数字或平均值", "回答后其余组获得同样信息"],
+      "review_layers": ["program", "professional"]
+    },
+    {
+      "id": "FAULT-02", "profile_id": "experience-draft", "suite": "failure_design", "status": "not_run",
+      "setup": "材料只有培训次数和参与人数，没有减负效果或满意率依据。",
+      "actions": ["generate_candidate", "review_document"], "invariants": ["I01", "I08"],
+      "expected_observable": ["不编造成效比例或排名", "仍能把已做工作写清楚", "必要局限不被空话掩盖"],
+      "review_layers": ["model", "professional"]
+    },
+    {
+      "id": "FAULT-03", "profile_id": "plan-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "锁定的第二部分包含旧截止日，新意见要求统一改为新日期。",
+      "actions": ["revise_candidate"], "invariants": ["I03", "I04", "I08"],
+      "expected_observable": ["返回 LOCKED_SCOPE_CONFLICT 并指出句子", "不静默解锁", "允许用户只放开冲突位置"],
+      "review_layers": ["program", "user"]
+    },
+    {
+      "id": "FAULT-04", "profile_id": "experience-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "模型基于 r1 生成候选期间，用户手改形成 r2；旧候选尝试提交。",
+      "actions": ["apply_user_edit", "commit_candidate"], "invariants": ["I05"],
+      "expected_observable": ["返回 REVISION_CONFLICT", "r2 未覆盖", "旧候选保留且可选择需要的修改"],
+      "review_layers": ["program", "user"]
+    },
+    {
+      "id": "FAULT-05", "profile_id": "experience-draft", "suite": "failure_design", "status": "not_run",
+      "setup": "初稿已审阅后上传新版统计表，相关数据改变。",
+      "actions": ["update_sources", "parse_sources", "prepare_basis", "review_document", "export_revision"], "invariants": ["I01", "I06"],
+      "expected_observable": ["受影响事实段落与检查待更新", "未受影响内容可复用", "不能以旧 Word 冒充当前输出"],
+      "review_layers": ["program", "professional", "user"]
+    },
+    {
+      "id": "FAULT-06", "profile_id": "experience-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "必需的待改稿为不可读扫描件；另有可读参考样稿。",
+      "actions": ["parse_sources", "query_status"], "invariants": ["I08"],
+      "expected_observable": ["标记原稿不可读", "不把参考样稿当待改稿", "提示另存、识别或粘贴原文，保留已读附件"],
+      "review_layers": ["program", "user"]
+    },
+    {
+      "id": "FAULT-07", "profile_id": "plan-draft", "suite": "failure_design", "status": "not_run",
+      "setup": "生成请求超时，服务尚不能判断是否已完成。",
+      "actions": ["generate_candidate", "query_status"], "invariants": ["I07"],
+      "expected_observable": ["使用原 request_id/job_id 查询", "未产生重复生成", "找到结果后原任务继续"],
+      "review_layers": ["program"]
+    },
+    {
+      "id": "FAULT-08", "profile_id": "plan-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "正文已为 r3，下载缓存仅有 r2 的 Word。",
+      "actions": ["export_revision", "query_status"], "invariants": ["I06"],
+      "expected_observable": ["当前下载等待或生成 r3", "r2 只能以历史版本显式提供", "失败不丢正文"],
+      "review_layers": ["program", "user"]
+    },
+    {
+      "id": "FAULT-09", "profile_id": "plan-draft", "suite": "failure_design", "status": "not_run",
+      "setup": "任务要求月底完成、下月复核，但没有可确定的业务时间锚点。",
+      "actions": ["prepare_basis", "record_answers"], "invariants": ["I02", "I04", "I08"],
+      "expected_observable": ["只追问影响安排的时间", "不擅用系统当天", "回答后正文和表格一致"],
+      "review_layers": ["professional", "user"]
+    },
+    {
+      "id": "FAULT-10", "profile_id": "plan-draft", "suite": "failure_design", "status": "not_run",
+      "setup": "只有用户目标，没有现成通知、预算或批准分工；用户要求先给建议方案。",
+      "actions": ["generate_candidate", "review_document"], "invariants": ["I04", "I08"],
+      "expected_observable": ["能够形成实用建议而非一律拒写", "建议与待定清楚", "不编造批准预算和权限"],
+      "review_layers": ["professional", "user"]
+    },
+    {
+      "id": "FAULT-11", "profile_id": "experience-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "只保留了原数字，但修改后把统计对象、年度或单位改了。",
+      "actions": ["review_document"], "invariants": ["I01", "I03"],
+      "expected_observable": ["识别语义事实变更", "不以数字字符串相等判为通过", "修正影响位置后重新核对"],
+      "review_layers": ["program", "model", "professional"]
+    },
+    {
+      "id": "FAULT-12", "profile_id": "experience-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "用户在补充新材料后恢复一个曾认可的历史版本，再继续修改。",
+      "actions": ["restore_revision", "apply_user_edit", "review_document", "export_revision"], "invariants": ["I01", "I05", "I06", "I08"],
+      "expected_observable": ["恢复产生新版本并保留历史", "旧认可和旧 Word 不直接继承", "按当前材料核对恢复稿并允许继续修改"],
+      "review_layers": ["program", "professional", "user"]
+    },
+    {
+      "id": "FAULT-13", "profile_id": "plan-revise", "suite": "failure_design", "status": "not_run",
+      "setup": "只修改任务表的共享时间字段。锁定段落源文本未变，但其中的字段槽渲染出了不同日期。",
+      "actions": ["revise_candidate", "review_document", "commit_candidate"], "invariants": ["I03", "I04", "I05"],
+      "expected_observable": ["显示 LOCKED_SCOPE_CONFLICT 及受影响段落", "父版正文和任务表原样保留", "用户可确认仅解锁关联句，再生成新依据"],
+      "review_layers": ["program", "user"]
+    }
+  ]
+}

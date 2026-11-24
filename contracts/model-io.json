@@ -1,0 +1,681 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gongwen model exchange v0.3",
+  "description": "模型调用分别使用 $defs.request 与 $defs.response。服务端同时校验 docs/开工规格.md 中的语义约束。",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/response"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,64}$"
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "profile": {
+      "enum": [
+        "experience-draft",
+        "experience-revise",
+        "plan-draft",
+        "plan-revise"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "current_facts",
+              "style_reference",
+              "source_instruction",
+              "draft",
+              "feedback"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "roles",
+        "locator",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "requirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "enum": [
+            "hard",
+            "preference"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "priority"
+      ],
+      "additionalProperties": false
+    },
+    "block": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "title",
+            "heading",
+            "paragraph",
+            "list_item"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ids": {
+          "$ref": "#/$defs/ids"
+        },
+        "requirement_ids": {
+          "$ref": "#/$defs/ids"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "evidence_ids",
+        "requirement_ids"
+      ],
+      "additionalProperties": false
+    },
+    "planField": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision_state": {
+          "enum": [
+            "source_required",
+            "user_decided",
+            "proposed",
+            "pending"
+          ]
+        },
+        "basis_ids": {
+          "$ref": "#/$defs/ids"
+        },
+        "pending_reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "decision_state",
+        "basis_ids",
+        "pending_reason"
+      ],
+      "additionalProperties": false
+    },
+    "planItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "fields": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "$ref": "#/$defs/planField"
+            },
+            "owner": {
+              "$ref": "#/$defs/planField"
+            },
+            "collaborators": {
+              "$ref": "#/$defs/planField"
+            },
+            "time_window": {
+              "$ref": "#/$defs/planField"
+            },
+            "deliverable": {
+              "$ref": "#/$defs/planField"
+            },
+            "acceptance_method": {
+              "$ref": "#/$defs/planField"
+            }
+          },
+          "required": [
+            "action",
+            "owner",
+            "collaborators",
+            "time_window",
+            "deliverable",
+            "acceptance_method"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "current": {
+      "type": "object",
+      "properties": {
+        "revision_id": {
+          "$ref": "#/$defs/id"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/block"
+          },
+          "minItems": 1
+        },
+        "plan_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/planItem"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "revision_id",
+        "blocks",
+        "plan_items"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "all_unlocked",
+            "selected"
+          ]
+        },
+        "allowed_block_ids": {
+          "$ref": "#/$defs/ids"
+        },
+        "locked_block_ids": {
+          "$ref": "#/$defs/ids"
+        },
+        "allowed_plan_item_ids": {
+          "$ref": "#/$defs/ids"
+        }
+      },
+      "required": [
+        "mode",
+        "allowed_block_ids",
+        "locked_block_ids",
+        "allowed_plan_item_ids"
+      ],
+      "additionalProperties": false
+    },
+    "question": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "related_ids": {
+          "$ref": "#/$defs/ids"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "reason",
+        "related_ids"
+      ],
+      "additionalProperties": false
+    },
+    "issue": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "FACT_PENDING",
+            "SOURCE_PARTIAL",
+            "PLAN_PENDING",
+            "TEMPLATE_LIMIT",
+            "COVERAGE_PENDING"
+          ]
+        },
+        "level": {
+          "enum": [
+            "pending",
+            "warning"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "related_ids": {
+          "$ref": "#/$defs/ids"
+        }
+      },
+      "required": [
+        "code",
+        "level",
+        "message",
+        "related_ids"
+      ],
+      "additionalProperties": false
+    },
+    "edit": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "replace"
+            },
+            "target_id": {
+              "$ref": "#/$defs/id"
+            },
+            "block": {
+              "$ref": "#/$defs/block"
+            }
+          },
+          "required": [
+            "op",
+            "target_id",
+            "block"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "insert_after"
+            },
+            "target_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "block": {
+              "$ref": "#/$defs/block"
+            }
+          },
+          "required": [
+            "op",
+            "target_id",
+            "block"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "remove"
+            },
+            "target_id": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "required": [
+            "op",
+            "target_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "move_after"
+            },
+            "target_id": {
+              "$ref": "#/$defs/id"
+            },
+            "after_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "target_id",
+            "after_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/$defs/profile"
+        },
+        "basis_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_request": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audience": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "purpose": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "date_anchor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "length_preference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_coverage_note": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          },
+          "minItems": 0
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          },
+          "minItems": 0
+        },
+        "current": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/current"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        }
+      },
+      "required": [
+        "profile",
+        "basis_key",
+        "original_request",
+        "audience",
+        "purpose",
+        "date_anchor",
+        "length_preference",
+        "source_coverage_note",
+        "sources",
+        "requirements",
+        "current",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "needsInput": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "needs_input"
+        },
+        "basis_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "status",
+        "basis_key",
+        "summary",
+        "questions"
+      ],
+      "additionalProperties": false
+    },
+    "draft": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "draft"
+        },
+        "basis_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/block"
+          },
+          "minItems": 1
+        },
+        "plan_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/planItem"
+          },
+          "minItems": 0
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "status",
+        "basis_key",
+        "summary",
+        "blocks",
+        "plan_items",
+        "issues"
+      ],
+      "additionalProperties": false
+    },
+    "patch": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "patch"
+        },
+        "basis_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edit"
+          },
+          "minItems": 0
+        },
+        "upsert_plan_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/planItem"
+          },
+          "minItems": 0
+        },
+        "remove_plan_item_ids": {
+          "$ref": "#/$defs/ids"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "status",
+        "basis_key",
+        "summary",
+        "edits",
+        "upsert_plan_items",
+        "remove_plan_item_ids",
+        "issues"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/needsInput"
+        },
+        {
+          "$ref": "#/$defs/draft"
+        },
+        {
+          "$ref": "#/$defs/patch"
+        }
+      ]
+    }
+  }
+}

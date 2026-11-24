@@ -1,0 +1,1 @@
+{"id":"gongwen-native","name":"公文材料业务工具","configSchema":{"type":"object","additionalProperties":false,"properties":{}},"contracts":{"tools":["gongwen_write","gongwen_public_search"]}}

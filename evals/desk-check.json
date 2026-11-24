@@ -1,0 +1,485 @@
+{
+  "version": "0.3",
+  "evidence_type": "manual_contract_example",
+  "description": "人工编写的成对合成输入及候选。验证的目标是契约可表达边界。没有调用模型、真实文档或服务。",
+  "cases": [
+    {
+      "id": "DESK-01",
+      "request": {
+        "profile": "plan-revise",
+        "basis_key": "demo-basis-normal",
+        "original_request": "台账核对改成12月底前完成，正文和分工表一起改，第二部分别动。",
+        "audience": "试点单位内部",
+        "purpose": "更新台账核对工作安排",
+        "date_anchor": "2026-11-05",
+        "length_preference": null,
+        "source_coverage_note": null,
+        "sources": [
+          {
+            "id": "draft1",
+            "roles": [
+              "draft"
+            ],
+            "locator": "演示原稿第一节及分工表",
+            "text": "综合办牵头、各业务科室配合，在11月30日前核对设备台账，交设备台账核对表。综合办逐项复核台账与设备编号。"
+          },
+          {
+            "id": "draft2",
+            "roles": [
+              "draft"
+            ],
+            "locator": "演示原稿第二节",
+            "text": "变动情况统一报综合办。"
+          },
+          {
+            "id": "feedback1",
+            "roles": [
+              "feedback"
+            ],
+            "locator": "本轮修改意见",
+            "text": "台账核对改为2026年12月31日前完成，正文和表格一起改，第二部分别动。"
+          }
+        ],
+        "requirements": [
+          {
+            "id": "r1",
+            "text": "正文和表格同步改为2026年12月31日前完成",
+            "priority": "hard"
+          },
+          {
+            "id": "r2",
+            "text": "第二部分保持不变",
+            "priority": "hard"
+          }
+        ],
+        "current": {
+          "revision_id": "demo-parent",
+          "blocks": [
+            {
+              "id": "b1",
+              "kind": "paragraph",
+              "text": "综合办在{{plan:p1:time_window}}完成台账核对。",
+              "evidence_ids": [
+                "draft1"
+              ],
+              "requirement_ids": []
+            },
+            {
+              "id": "b2",
+              "kind": "paragraph",
+              "text": "变动情况统一报综合办。",
+              "evidence_ids": [
+                "draft2"
+              ],
+              "requirement_ids": [
+                "r2"
+              ]
+            }
+          ],
+          "plan_items": [
+            {
+              "id": "p1",
+              "fields": {
+                "action": {
+                  "value": "核对设备台账",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "owner": {
+                  "value": "综合办",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "collaborators": {
+                  "value": "各业务科室",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "time_window": {
+                  "value": "11月30日前",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "deliverable": {
+                  "value": "设备台账核对表",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "acceptance_method": {
+                  "value": "综合办逐项复核台账与设备编号",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                }
+              }
+            }
+          ]
+        },
+        "scope": {
+          "mode": "selected",
+          "allowed_block_ids": [
+            "b1"
+          ],
+          "locked_block_ids": [
+            "b2"
+          ],
+          "allowed_plan_item_ids": [
+            "p1"
+          ]
+        }
+      },
+      "candidate": {
+        "status": "patch",
+        "basis_key": "demo-basis-normal",
+        "summary": "更新台账核对日期，保留其他任务字段。",
+        "edits": [
+          {
+            "op": "replace",
+            "target_id": "b1",
+            "block": {
+              "id": "b1",
+              "kind": "paragraph",
+              "text": "综合办在{{plan:p1:time_window}}完成台账核对。",
+              "evidence_ids": [
+                "feedback1"
+              ],
+              "requirement_ids": [
+                "r1"
+              ]
+            }
+          }
+        ],
+        "upsert_plan_items": [
+          {
+            "id": "p1",
+            "fields": {
+              "action": {
+                "value": "核对设备台账",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "owner": {
+                "value": "综合办",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "collaborators": {
+                "value": "各业务科室",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "time_window": {
+                "value": "12月31日前",
+                "decision_state": "user_decided",
+                "basis_ids": [
+                  "feedback1"
+                ],
+                "pending_reason": null
+              },
+              "deliverable": {
+                "value": "设备台账核对表",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "acceptance_method": {
+                "value": "综合办逐项复核台账与设备编号",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              }
+            }
+          }
+        ],
+        "remove_plan_item_ids": [],
+        "issues": []
+      },
+      "expected": {
+        "outcome": "candidate_can_continue_review",
+        "rendered_block_ids_changed": [
+          "b1"
+        ],
+        "same_task_table_time": "12月31日前",
+        "preserve_base_revision": true
+      }
+    },
+    {
+      "id": "DESK-02",
+      "request": {
+        "profile": "plan-revise",
+        "basis_key": "demo-basis-conflict",
+        "original_request": "台账核对改成12月底前完成，正文和分工表一起改，第二部分别动。",
+        "audience": "试点单位内部",
+        "purpose": "更新台账核对工作安排",
+        "date_anchor": "2026-11-05",
+        "length_preference": null,
+        "source_coverage_note": null,
+        "sources": [
+          {
+            "id": "draft1",
+            "roles": [
+              "draft"
+            ],
+            "locator": "演示原稿第一节及分工表",
+            "text": "综合办牵头、各业务科室配合，在11月30日前核对设备台账，交设备台账核对表。综合办逐项复核台账与设备编号。"
+          },
+          {
+            "id": "draft2",
+            "roles": [
+              "draft"
+            ],
+            "locator": "演示原稿第二节",
+            "text": "综合办在11月30日前收齐核对表。"
+          },
+          {
+            "id": "feedback1",
+            "roles": [
+              "feedback"
+            ],
+            "locator": "本轮修改意见",
+            "text": "台账核对改为2026年12月31日前完成，正文和表格一起改，第二部分别动。"
+          }
+        ],
+        "requirements": [
+          {
+            "id": "r1",
+            "text": "正文和表格同步改为2026年12月31日前完成",
+            "priority": "hard"
+          },
+          {
+            "id": "r2",
+            "text": "第二部分保持不变",
+            "priority": "hard"
+          }
+        ],
+        "current": {
+          "revision_id": "demo-parent-conflict",
+          "blocks": [
+            {
+              "id": "b1",
+              "kind": "paragraph",
+              "text": "综合办在{{plan:p1:time_window}}完成台账核对。",
+              "evidence_ids": [
+                "draft1"
+              ],
+              "requirement_ids": []
+            },
+            {
+              "id": "b2",
+              "kind": "paragraph",
+              "text": "综合办在{{plan:p1:time_window}}收齐核对表。",
+              "evidence_ids": [
+                "draft2"
+              ],
+              "requirement_ids": [
+                "r2"
+              ]
+            }
+          ],
+          "plan_items": [
+            {
+              "id": "p1",
+              "fields": {
+                "action": {
+                  "value": "核对设备台账",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "owner": {
+                  "value": "综合办",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "collaborators": {
+                  "value": "各业务科室",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "time_window": {
+                  "value": "11月30日前",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "deliverable": {
+                  "value": "设备台账核对表",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                },
+                "acceptance_method": {
+                  "value": "综合办逐项复核台账与设备编号",
+                  "decision_state": "source_required",
+                  "basis_ids": [
+                    "draft1"
+                  ],
+                  "pending_reason": null
+                }
+              }
+            }
+          ]
+        },
+        "scope": {
+          "mode": "selected",
+          "allowed_block_ids": [
+            "b1"
+          ],
+          "locked_block_ids": [
+            "b2"
+          ],
+          "allowed_plan_item_ids": [
+            "p1"
+          ]
+        }
+      },
+      "candidate": {
+        "status": "patch",
+        "basis_key": "demo-basis-conflict",
+        "summary": "更新台账核对日期，保留其他任务字段。",
+        "edits": [
+          {
+            "op": "replace",
+            "target_id": "b1",
+            "block": {
+              "id": "b1",
+              "kind": "paragraph",
+              "text": "综合办在{{plan:p1:time_window}}完成台账核对。",
+              "evidence_ids": [
+                "feedback1"
+              ],
+              "requirement_ids": [
+                "r1"
+              ]
+            }
+          }
+        ],
+        "upsert_plan_items": [
+          {
+            "id": "p1",
+            "fields": {
+              "action": {
+                "value": "核对设备台账",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "owner": {
+                "value": "综合办",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "collaborators": {
+                "value": "各业务科室",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "time_window": {
+                "value": "12月31日前",
+                "decision_state": "user_decided",
+                "basis_ids": [
+                  "feedback1"
+                ],
+                "pending_reason": null
+              },
+              "deliverable": {
+                "value": "设备台账核对表",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              },
+              "acceptance_method": {
+                "value": "综合办逐项复核台账与设备编号",
+                "decision_state": "source_required",
+                "basis_ids": [
+                  "draft1"
+                ],
+                "pending_reason": null
+              }
+            }
+          }
+        ],
+        "remove_plan_item_ids": [],
+        "issues": []
+      },
+      "expected": {
+        "outcome": "LOCKED_SCOPE_CONFLICT",
+        "rendered_block_ids_changed": [
+          "b1",
+          "b2"
+        ],
+        "preserve_base_revision": true
+      },
+      "valid_model_alternative": {
+        "status": "needs_input",
+        "basis_key": "demo-basis-conflict",
+        "summary": "第二部分引用同一个截止日期，改日期会改变锁定段落的显示内容。",
+        "questions": [
+          {
+            "id": "q1",
+            "text": "可以只解锁第二部分的截止日期，和正文及分工表一起改吗？",
+            "reason": "锁定段落与任务表共用台账核对日期。",
+            "related_ids": [
+              "b2",
+              "p1",
+              "r1",
+              "r2"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

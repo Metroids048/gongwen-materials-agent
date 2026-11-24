@@ -1,0 +1,204 @@
+{
+  "contract_version": "0.3",
+  "implementation_status": "registration_query_and_public_plan_revision_slice",
+  "description": "公文材料 Agent 的声明式工作流规格，不是 JSON Schema 或运行结果。四条路径已接入登记和查询；南阳公开试跑另接入候选生成、采用、正文手改与同版导出。",
+  "profiles": [
+    {"id": "experience-draft", "document_type": "experience", "mode": "draft", "required_roles": ["current_facts"], "rule_files": ["../skills/gongwen-materials/references/experience.md"]},
+    {"id": "experience-revise", "document_type": "experience", "mode": "revise", "required_roles": ["draft"], "rule_files": ["../skills/gongwen-materials/references/experience.md", "../skills/gongwen-materials/references/revision.md"]},
+    {"id": "plan-draft", "document_type": "work_plan", "mode": "draft", "required_roles": [], "rule_files": ["../skills/gongwen-materials/references/work-plan.md"]},
+    {"id": "plan-revise", "document_type": "work_plan", "mode": "revise", "required_roles": ["draft"], "rule_files": ["../skills/gongwen-materials/references/work-plan.md", "../skills/gongwen-materials/references/revision.md"]}
+  ],
+  "source_roles": [
+    "current_facts",
+    "style_reference",
+    "source_instruction",
+    "draft",
+    "feedback"
+  ],
+  "source_role_rules": {
+    "multiple_roles_allowed": true,
+    "role_granularity": "source_or_segment",
+    "pasted_user_text_can_be_source": true,
+    "experience_draft_missing_facts": "request_input_or_offer_structure_only_never_invent_experience",
+    "work_plan_without_sources": "create_proposal_with_explicit_assumptions_and_pending_decisions",
+    "style_reference_is_fact_authority": false
+  },
+  "task_states": [
+    "received",
+    "parsing",
+    "preparing",
+    "needs_input",
+    "drafting",
+    "reviewing",
+    "ready_for_review",
+    "failed",
+    "canceled"
+  ],
+  "quality_states": [
+    "unreviewed",
+    "blocked",
+    "needs_confirmation",
+    "reviewable",
+    "accepted"
+  ],
+  "job_states": [
+    "queued",
+    "running",
+    "succeeded",
+    "failed",
+    "unknown",
+    "canceled"
+  ],
+  "transitions": [
+    {"from": "received", "to": "parsing", "condition": "input_registered"},
+    {"from": "parsing", "to": "preparing", "condition": "usable_sources_or_permitted_no_attachment_path"},
+    {"from": "parsing", "to": "needs_input", "condition": "essential_source_unreadable"},
+    {"from": "preparing", "to": "needs_input", "condition": "material_ambiguity_blocks_writing"},
+    {"from": "preparing", "to": "drafting", "condition": "sufficient_basis_or_explicit_proposal_mode"},
+    {"from": "needs_input", "to": "preparing", "condition": "answer_or_user_authorized_nonblocking_draft"},
+    {"from": "drafting", "to": "reviewing", "condition": "candidate_saved"},
+    {"from": "drafting", "to": "needs_input", "condition": "new_material_conflict_detected"},
+    {"from": "reviewing", "to": "drafting", "condition": "specific_fix_with_new_information_or_changed_approach"},
+    {"from": "reviewing", "to": "ready_for_review", "condition": "candidate_and_review_atomically_committed_or_current_review_refreshed"},
+    {"from": "ready_for_review", "to": "preparing", "condition": "new_feedback_without_source_reparse"},
+    {"from": "failed", "to": "preparing", "condition": "cause_resolved_and_resume_from_basis"},
+    {"from": "needs_input", "to": "parsing", "condition": "essential_source_replaced"},
+    {"from": "ready_for_review", "to": "parsing", "condition": "source_set_changed"},
+    {"from": "ready_for_review", "to": "reviewing", "condition": "user_edit_or_restore_creates_current_version_for_recheck"},
+    {"from": "reviewing", "to": "needs_input", "condition": "locked_scope_conflict_or_required_user_decision"},
+    {"from": "reviewing", "to": "preparing", "condition": "basis_invalidated_and_current_attempt_abandoned"},
+    {"from": "failed", "to": "parsing", "condition": "source_extraction_failure_resolved"}
+  ],
+  "transition_rules": {
+    "terminal_failure_from": [
+      "parsing",
+      "preparing",
+      "drafting",
+      "reviewing"
+    ],
+    "cancel_from": [
+      "received",
+      "parsing",
+      "preparing",
+      "needs_input",
+      "drafting",
+      "reviewing",
+      "ready_for_review",
+      "failed"
+    ],
+    "ready_for_review_means": "current_revision_exists_and_latest_attempt_has_valid_review",
+    "accepted_requires": "explicit_user_acceptance_for_exact_revision_with_reviewable_quality",
+    "editing_accepted_revision": "creates_new_revision_and_invalidates_acceptance_for_new_revision",
+    "restore_revision": "creates_new_revision_from_selected_content_and_rechecks_current_source_dependencies_without_inheriting_acceptance",
+    "rule_version_includes": "core_prompt_skill_references_unit_style_and_relevant_checker_versions",
+    "candidate_id_aliases_revision_id": true,
+    "export_job_is_separate_from_task_state": true,
+    "candidate_commit_requires": "valid_bound_review_and_no_blocking_issue",
+    "current_user_edit": "preserve_new_user_version_as_unreviewed_before_recheck",
+    "quality_scope": "quality_state_is_for_current_revision_with_its_active_basis; candidate_failure_is_attempt_local"
+  },
+  "entities": {
+    "Task": {"required": ["task_id", "profile_id", "original_request", "requirements", "task_state", "quality_state", "current_revision", "source_set_version", "owner_id", "basis_key"], "optional": ["audience", "purpose", "length_preference", "unit_style_id", "resume_checkpoint", "date_anchor", "lock_set", "active_request_id"]},
+    "Source": {"required": ["source_id", "source_version", "content_hash", "roles", "extraction_status", "locators"], "locator_kinds": ["page", "paragraph", "sheet_cell", "text_span"], "extraction_statuses": ["pending", "read", "partial", "unreadable"]},
+    "Requirement": {"required": ["requirement_id", "user_text", "priority", "coverage", "resolution"], "resolutions": ["pending", "covered", "needs_input", "not_applicable_with_reason"]},
+    "Fact": {"required": ["fact_id", "statement", "source_refs", "confirmation_state"], "optional": ["subject", "period", "value", "unit", "denominator", "scope", "conflicting_fact_ids"], "confirmation_states": ["source_supported", "user_confirmed", "conflicting", "unverified"]},
+    "PlanItem": {"required": ["id", "fields"], "decision_states": ["source_required", "user_decided", "proposed", "pending"], "unknown_value": "null_with_explicit_pending_reason", "fields": ["action", "owner", "collaborators", "time_window", "deliverable", "acceptance_method"], "field_required": ["value", "decision_state", "basis_ids", "pending_reason"]},
+    "Revision": {"required": ["revision_id", "parent_revision", "base_revision", "blocks", "change_scope", "source_set_version", "rule_version", "revision_state", "basis_key", "plan_items"], "revision_states": ["candidate", "current", "archived"], "block_required": ["id", "kind", "text", "evidence_ids", "requirement_ids"]},
+    "Review": {"required": ["review_id", "revision_id", "source_set_version", "rule_version", "checks", "issues", "validity", "basis_key", "quality_state", "requirement_coverage"], "validity_states": ["valid", "partially_invalidated", "invalidated"]},
+    "Artifact": {"required": ["artifact_id", "revision_id", "source_set_version", "template_version", "content_hash", "format", "job_state", "quality_label"], "formats": ["docx", "change_report", "plan_table"]}
+  },
+  "action_result": {
+    "required": [
+      "status",
+      "summary",
+      "next_actions",
+      "artifacts",
+      "task_id",
+      "request_id"
+    ],
+    "status_values": [
+      "success",
+      "warning",
+      "error"
+    ],
+    "optional": [
+      "revision_id",
+      "candidate_id",
+      "job_id",
+      "data",
+      "error"
+    ],
+    "error_required": [
+      "code",
+      "impact",
+      "retry_safe",
+      "recovery_action"
+    ],
+    "success_semantics": "action_completed_not_business_approved"
+  },
+  "actions": [
+    {"id": "register_task", "requires": ["request_id", "original_request", "inputs"], "produces": ["task_id", "profile_id", "source_ids", "task_understanding"], "writes": true, "requires_expected_revision": false},
+    {"id": "update_sources", "requires": ["request_id", "task_id", "expected_revision", "expected_source_set_version", "source_changes"], "produces": ["source_ids", "source_set_version", "invalidated_dependencies"], "writes": true, "requires_expected_revision": true},
+    {"id": "parse_sources", "requires": ["request_id", "task_id", "source_ids", "expected_source_set_version"], "produces": ["extraction_results", "source_set_version"], "writes": true, "requires_expected_revision": false},
+    {"id": "prepare_basis", "requires": ["request_id", "task_id", "expected_revision", "source_set_version"], "produces": ["requirements", "facts", "constraints", "questions", "basis_key"], "writes": true, "requires_expected_revision": true},
+    {"id": "record_answers", "requires": ["request_id", "task_id", "expected_revision", "answers"], "produces": ["updated_basis", "remaining_questions"], "writes": true, "requires_expected_revision": true},
+    {"id": "generate_candidate", "requires": ["request_id", "task_id", "expected_revision", "source_set_version", "profile_id", "basis_key"], "produces": ["candidate_id", "blocks", "plan_items", "open_issues", "questions_if_blocked"], "writes": true, "requires_expected_revision": true},
+    {"id": "revise_candidate", "requires": ["request_id", "task_id", "expected_revision", "feedback", "allowed_blocks", "locked_blocks", "allowed_plan_item_ids", "basis_key"], "produces": ["candidate_id", "change_report", "linked_changes", "open_issues", "questions_if_blocked"], "writes": true, "requires_expected_revision": true},
+    {"id": "review_document", "requires": ["request_id", "task_id", "revision_id", "source_set_version", "rule_version", "basis_key"], "produces": ["review_id", "quality_state", "issues", "requirement_coverage"], "writes": true, "requires_expected_revision": false, "target_states": ["candidate", "current"]},
+    {"id": "commit_candidate", "requires": ["request_id", "task_id", "candidate_id", "expected_revision", "review_id", "source_set_version", "basis_key", "rule_version"], "produces": ["revision_id", "invalidated_artifacts"], "writes": true, "requires_expected_revision": true},
+    {"id": "apply_user_edit", "requires": ["request_id", "task_id", "expected_revision", "block_edits"], "produces": ["revision_id", "invalidated_reviews", "invalidated_artifacts"], "writes": true, "requires_expected_revision": true},
+    {"id": "restore_revision", "requires": ["request_id", "task_id", "expected_revision", "selected_revision_id"], "produces": ["revision_id", "open_issues", "invalidated_reviews", "invalidated_artifacts"], "writes": true, "requires_expected_revision": true},
+    {"id": "export_revision", "requires": ["request_id", "task_id", "revision_id", "template_version", "allow_draft"], "produces": ["job_id", "artifact_ids", "quality_label"], "writes": true, "requires_expected_revision": false},
+    {"id": "accept_revision", "requires": ["request_id", "task_id", "expected_revision", "explicit_user_acceptance"], "produces": ["revision_id", "quality_state"], "writes": true, "requires_expected_revision": true},
+    {"id": "query_status", "requires": ["request_id", "task_id", "target_request_or_job_id"], "produces": ["task_state", "job_state", "existing_result", "recovery_action"], "writes": false, "requires_expected_revision": false}
+  ],
+  "invariants": [
+    {"id": "I01", "rule": "Facts preserve subject, period, units, scope and denominator; style references never silently become current facts."},
+    {"id": "I02", "rule": "Each applicable user requirement is covered by blocks or has an explicit unresolved reason."},
+    {"id": "I03", "rule": "Compare IDs, structure, and rendered content with base. Locked or out-of-scope changes, including indirect changes from shared plan fields, require explicit authorization and a new basis."},
+    {"id": "I04", "rule": "Scheme narrative and task tables derive from the same PlanItem set and revision."},
+    {"id": "I05", "rule": "Candidate commit checks owner, task, active basis key, base revision, source and rule versions, and review target atomically. Stale candidates never overwrite user edits."},
+    {"id": "I06", "rule": "Changed dependencies invalidate affected reviews and artifacts; current download never silently selects a stale artifact."},
+    {"id": "I07", "rule": "Unknown generation outcome is queried by request or job ID before any resubmission."},
+    {"id": "I08", "rule": "Unresolved factual claims, unapproved decisions and unread sources remain visible; action success is never user approval."}
+  ],
+  "recovery_codes": [
+    {"code": "SOURCE_UNREADABLE", "retry_safe": false, "recovery": "Show affected source; use readable files and request essential text or conversion."},
+    {"code": "FACT_CONFLICT", "retry_safe": false, "recovery": "Show exact source statements; request authority choice or draft unaffected content with explicit open issue."},
+    {"code": "LOCKED_SCOPE_CONFLICT", "retry_safe": false, "recovery": "Preserve locked blocks and ask which specific constraint may change."},
+    {"code": "REVISION_CONFLICT", "retry_safe": false, "recovery": "Keep candidate and current edit; reload current revision and offer selective application."},
+    {"code": "SOURCE_VERSION_CONFLICT", "retry_safe": false, "recovery": "Rebuild affected basis before committing or exporting current revision."},
+    {"code": "JOB_OUTCOME_UNKNOWN", "retry_safe": false, "recovery": "Query original request or job; do not submit duplicate generation."},
+    {"code": "EXPORT_FAILED", "retry_safe": true, "recovery": "Keep reviewed text; retry idempotent export for the same immutable revision after cause is addressed."}
+  ],
+  "idempotency": {
+    "all_writes_use_request_id": true,
+    "scope": "authenticated_owner_and_task_and_action",
+    "same_request_same_payload": "return_existing_job_or_result",
+    "same_request_different_payload": "reject_conflict",
+    "initial_expected_revision": null,
+    "source_parse_change": "increments_source_set_version_and_marks_dependent_outputs_stale"
+  },
+  "export_policy": {
+    "bind_exact_revision": true,
+    "current_download_verifies_revision_and_dependencies": true,
+    "historical_download_requires_explicit_version_label": true,
+    "draft_quality_states_require_allow_draft": [
+      "unreviewed",
+      "needs_confirmation"
+    ],
+    "quality_labels": [
+      "草稿待核",
+      "可审阅",
+      "用户已认可"
+    ],
+    "word_native_track_changes_promised": false,
+    "blocked_never_export_as_current": true
+  },
+  "model_contract": {
+    "prompt": "../prompts/core.md",
+    "schema": "model-io.json",
+    "request": "#/$defs/request",
+    "response": "#/$defs/response"
+  }
+}
